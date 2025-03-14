@@ -2,4 +2,4 @@ elise_robot/elise_first_joint_moveit_config/*
 build/*
 install/*
 log/*
-__pycache/*
+__pycache__/*
