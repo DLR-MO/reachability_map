@@ -1,6 +1,46 @@
-# reachability_map
+# reachability_map_moveit
 
-This git contains a Python script to generate reachability maps for robots based on their URDF.
+TODO
 
-Run elise moveit demo launch.
-Then run python file
+- [Container Images](#container-images)
+- [reachability_map_moveit](#reachability_map_moveit)
+
+
+### Container Images
+
+| Description | Image:Tag | Default Command |
+| --- | --- | -- |
+|  |  |  |
+
+
+## `reachability_map_moveit`
+
+### Subscribed Topics
+
+| Topic | Type | Description |
+| --- | --- | --- |
+|  |  |  |
+
+### Published Topics
+
+| Topic | Type | Description |
+| --- | --- | --- |
+|  |  |  |
+
+### Services
+
+| Service | Type | Description |
+| --- | --- | --- |
+|  |  |  |
+
+### Actions
+
+| Action | Type | Description |
+| --- | --- | --- |
+|  |  |  |
+
+### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+|  |  |  |
