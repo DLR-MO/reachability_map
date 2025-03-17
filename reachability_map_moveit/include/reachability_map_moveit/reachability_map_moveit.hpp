@@ -6,7 +6,7 @@
 #include <math.h>
 #include <iostream>
 #include <cmath>
-
+#include <fstream>
 
 #include <rclcpp/rclcpp.hpp>
 #include <moveit/robot_model_loader/robot_model_loader.hpp>
@@ -14,6 +14,7 @@
 #include <moveit/robot_state/robot_state.hpp>
 
 #include "bonxai/bonxai.hpp"
+#include "bonxai/serialization.hpp"
 
 #include <argparse/argparse.hpp>
 
@@ -31,6 +32,8 @@ class ReachabilityMapMoveit {
   void generate_reachability_map();
   void send_marker_message(bool use_sphere, float scale);
   void spin();
+  void save_reachability_map(std::string path);
+  void load_reachability_map(std::string path);
 
  private:
   void try_configurations_recursively(long unsigned int i);

@@ -131,8 +131,26 @@ void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
   marker_pub_->publish(marker_array);
   RCLCPP_INFO(node_->get_logger(), "Published reachability map markers.");
 }
+
+void ReachabilityMapMoveit::save_reachability_map(std::string path){
+  ofstream file(path);
+  Bonxai::Serialize(file, grid_);
+  file.close();
+  
+  RCLCPP_INFO(node_->get_logger(), "Saved reachability map to file.");
 }
 
+void ReachabilityMapMoveit::load_reachability_map(std::string path){
+  ifstream file(path);
+  char header[256];
+  file.getline(header, 256);
+  Bonxai::HeaderInfo info = Bonxai::GetHeaderInfo(header);
+  grid_ = Bonxai::Deserialize<uint32_t>(file, info);
+  RCLCPP_INFO(node_->get_logger(), "Loaded reachability map from file.");
+}
+}
+
+//todo add export to pointcloud or csv method
 
 int main(int argc, char *argv[]) {
 
@@ -146,7 +164,8 @@ int main(int argc, char *argv[]) {
 
   args.add_argument("--sphere").help("Use spheres instead of voxel").flag();
   args.add_argument("--scale").default_value(1.0).help("Set to a value between [0,1] to scale markers smaller.").scan<'f', double>();
-
+  args.add_argument("--save").default_value("").help("Save the reachability map to the provided path.");
+  args.add_argument("--load").default_value("").help("Load the reachability map from the provided path. This will not run the computation again.");
 
   try {
     args.parse_args(argc, argv);
@@ -156,8 +175,6 @@ int main(int argc, char *argv[]) {
     std::cerr << args;
     return 1;
   }
-
-
 
   //TODO get this from arguments
   string robot_name = args.get<std::string>("robot-name");//"elise";
@@ -170,9 +187,19 @@ int main(int argc, char *argv[]) {
     std::cerr << "Scale must be between [0,1]." << std::endl;
     return 1;
   }
+  std::string save_path = args.get<std::string>("--save");
+  std::string load_path = args.get<std::string>("--load");
+  std::cout << load_path << std::endl;
 
   auto grid_node = make_shared<reachability_map_moveit::ReachabilityMapMoveit>(robot_name, joint_group_name_, voxel_size, ang_step_size);
-  grid_node->generate_reachability_map();
+  if(load_path == ""){
+    grid_node->generate_reachability_map();
+  }else{
+    grid_node->load_reachability_map(load_path);
+  }
+  if (save_path != ""){
+    grid_node->save_reachability_map(save_path);
+  }
   grid_node->send_marker_message(use_sphere, scale);
 
   grid_node->spin();
