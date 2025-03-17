@@ -15,6 +15,8 @@
 
 #include "bonxai/bonxai.hpp"
 
+#include <argparse/argparse.hpp>
+
 namespace reachability_map_moveit {
 
 template <typename C> struct is_vector : std::false_type {};    
@@ -27,7 +29,7 @@ class ReachabilityMapMoveit {
  public:
   ReachabilityMapMoveit(const std::string& robot_name, const std::string& joint_group_name, const double voxel_size, const double ang_step_size);
   void generate_reachability_map();
-  void send_marker_message();
+  void send_marker_message(bool use_sphere, float scale);
   void spin();
 
  private:

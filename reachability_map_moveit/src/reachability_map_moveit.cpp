@@ -92,8 +92,12 @@ void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i) 
   }
 }
 
-void ReachabilityMapMoveit::send_marker_message() {
+void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
   visualization_msgs::msg::MarkerArray marker_array;
+  auto type = visualization_msgs::msg::Marker::CUBE;
+  if (use_sphere){
+    type = visualization_msgs::msg::Marker::SPHERE;
+  }
   uint32_t id = 0;
   uint32_t max_val = 0;
   auto maxVisitor = [this, &max_val](const uint32_t& value, const Bonxai::CoordT& coord) {
@@ -101,17 +105,17 @@ void ReachabilityMapMoveit::send_marker_message() {
   };
   grid_.forEachCell(maxVisitor);
 
-  auto markerVisitor = [this, &marker_array, &max_val, &id](const uint32_t& value, const Bonxai::CoordT& coord) {    
+  auto markerVisitor = [this, &marker_array, &max_val, &id, &type, &scale](const uint32_t& value, const Bonxai::CoordT& coord) {    
         double r = (max_val - value) / static_cast<double>(max_val);
         double g = value / static_cast<double>(max_val);
         visualization_msgs::msg::Marker marker;
         marker.header.frame_id = "base_link";
         marker.ns = "reachability_map";
         marker.id = id++;
-        marker.type = marker.CUBE;
-        marker.scale.x = voxel_size_ * 0.8;
-        marker.scale.y = voxel_size_ * 0.8;
-        marker.scale.z = voxel_size_ * 0.8;
+        marker.type = type;
+        marker.scale.x = voxel_size_ * scale;
+        marker.scale.y = voxel_size_ * scale;
+        marker.scale.z = voxel_size_ * scale;
         auto pos = grid_.coordToPos(coord);
         marker.pose.position.x = pos.x;
         marker.pose.position.y = pos.y;
@@ -121,7 +125,7 @@ void ReachabilityMapMoveit::send_marker_message() {
         marker.color.g = g;
         marker.color.b = 0.0;
         marker.color.a = 1.0;
-        marker_array.markers.push_back(marker);    
+        marker_array.markers.push_back(marker);
   };
   grid_.forEachCell(markerVisitor);
   marker_pub_->publish(marker_array);
@@ -134,15 +138,42 @@ int main(int argc, char *argv[]) {
 
   rclcpp::init(argc, argv);
 
+  argparse::ArgumentParser args("Reachability Map Moveit");
+  args.add_argument("robot-name").help("Name of your robot, e.g. \"panda\"");
+  args.add_argument("joint-group-name").help("Name of the joint group that you want to use.");
+  args.add_argument("voxel-size").help("Size of the voxel [m].").scan<'f', double>();
+  args.add_argument("sampling-resolution").help("Angular sampling resolution [deg].").scan<'f', double>();
+
+  args.add_argument("--sphere").help("Use spheres instead of voxel").flag();
+  args.add_argument("--scale").default_value(1.0).help("Set to a value between [0,1] to scale markers smaller.").scan<'f', double>();
+
+
+  try {
+    args.parse_args(argc, argv);
+  }
+  catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << args;
+    return 1;
+  }
+
+
+
   //TODO get this from arguments
-  string robot_name = "elise";
-  string joint_group_name_ = "endo";
-  double voxel_size = 0.005;
-  double ang_step_size = M_PI / 360;
+  string robot_name = args.get<std::string>("robot-name");//"elise";
+  string joint_group_name_ = args.get<std::string>("joint-group-name");//"endo";
+  double voxel_size = args.get<double>("voxel-size");//0.005;
+  double ang_step_size = args.get<double>("sampling-resolution") * (M_PI / 180.0);//M_PI / 360;
+  bool use_sphere = args.get<bool>("--sphere");//true  
+  double scale = args.get<double>("--scale");
+  if (scale <0.0 || scale >1.0) {
+    std::cerr << "Scale must be between [0,1]." << std::endl;
+    return 1;
+  }
 
   auto grid_node = make_shared<reachability_map_moveit::ReachabilityMapMoveit>(robot_name, joint_group_name_, voxel_size, ang_step_size);
   grid_node->generate_reachability_map();
-  grid_node->send_marker_message();
+  grid_node->send_marker_message(use_sphere, scale);
 
   grid_node->spin();
   rclcpp::shutdown();
