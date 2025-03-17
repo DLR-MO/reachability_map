@@ -22,38 +22,18 @@ template <typename T,typename A> struct is_vector< std::vector<T,A> > : std::tru
 template <typename C> inline constexpr bool is_vector_v = is_vector<C>::value;
 
 
-class ReachabilityMapMoveit : public rclcpp::Node {
+class ReachabilityMapMoveit {
 
  public:
-
-  ReachabilityMapMoveit(const std::string& robot_name, const std::string& joint_group_name, const std::vector<std::vector<double>> map_size, const double voxel_size, const double ang_step_size);
+  ReachabilityMapMoveit(const std::string& robot_name, const std::string& joint_group_name, const double voxel_size, const double ang_step_size);
   void generate_reachability_map();
   void send_marker_message();
+  void spin();
 
  private:
-  void try_configurations_recursively(int i);
-  void xyz_from_grid_entry(int i_x, int i_y, int i_z, double& x, double& y, double& z);
-  void grid_entry_from_xyz(double x, double y, double z, int& i_x, int& i_y, int& i_z);
+  void try_configurations_recursively(long unsigned int i);
 
-
-  /*template <typename T>
-  void declareAndLoadParameter(const std::string &name,
-                               T &param,
-                               const std::string &description,
-                               const bool add_to_auto_reconfigurable_params = true,
-                               const bool is_required = false,
-                               const bool read_only = false,
-                               const std::optional<double> &from_value = std::nullopt,
-                               const std::optional<double> &to_value = std::nullopt,
-                               const std::optional<double> &step_value = std::nullopt,
-                               const std::string &additional_constraints = "");
-  rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter>& parameters);
-  */
-  
-  //double param_ = 1.0;
-  //std::vector<std::tuple<std::string, std::function<void(const rclcpp::Parameter &)>>> auto_reconfigurable_params_;
-  //OnSetParametersCallbackHandle::SharedPtr parameters_callback_;
-
+  rclcpp::Node::SharedPtr node_;
   const std::string robot_name_;
   const std::string joint_group_name_;
   const std::vector<std::vector<double>> map_size_; //m  
