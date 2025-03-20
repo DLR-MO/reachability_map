@@ -92,6 +92,16 @@ void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i) 
   }
 }
 
+uint32_t ReachabilityMapMoveit::get_max_value(){
+  uint32_t max_val = 0;
+  auto maxVisitor = [this, &max_val](const uint32_t& value, const Bonxai::CoordT& coord) {
+    max_val = std::max(max_val, value);
+  };
+  grid_.forEachCell(maxVisitor);
+  return max_val;
+}
+
+
 void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
   visualization_msgs::msg::MarkerArray marker_array;
   auto type = visualization_msgs::msg::Marker::CUBE;
@@ -99,11 +109,7 @@ void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
     type = visualization_msgs::msg::Marker::SPHERE;
   }
   uint32_t id = 0;
-  uint32_t max_val = 0;
-  auto maxVisitor = [this, &max_val](const uint32_t& value, const Bonxai::CoordT& coord) {
-    max_val = std::max(max_val, value);
-  };
-  grid_.forEachCell(maxVisitor);
+  uint32_t max_val = get_max_value();
 
   auto markerVisitor = [this, &marker_array, &max_val, &id, &type, &scale](const uint32_t& value, const Bonxai::CoordT& coord) {    
         double r = (max_val - value) / static_cast<double>(max_val);
@@ -148,6 +154,33 @@ void ReachabilityMapMoveit::load_reachability_map(std::string path){
   grid_ = Bonxai::Deserialize<uint32_t>(file, info);
   RCLCPP_INFO(node_->get_logger(), "Loaded reachability map from file.");
 }
+void ReachabilityMapMoveit::export_pcd(std::string path){
+  pcl::PointCloud<pcl::PointXYZRGBL> cloud;
+  // we need to publish it als unorganized cloud
+  cloud.width    = grid_.activeCellsCount();
+  cloud.height   = 1;
+  cloud.is_dense = true;
+  cloud.resize (cloud.width * cloud.height);
+  uint32_t i = 0;
+  uint32_t max_val = get_max_value();
+
+  auto cloudVisitor = [this, &cloud, &i, &max_val](const uint32_t& value, const Bonxai::CoordT& coord) {        
+        auto pos = grid_.coordToPos(coord);
+        cloud.points[i].x = pos.x;
+        cloud.points[i].y = pos.y;
+        cloud.points[i].z = pos.z;        
+        cloud.points[i].r = ((max_val - value) / static_cast<double>(max_val))*255;
+        cloud.points[i].g = (value / static_cast<double>(max_val))*255; 
+        cloud.points[i].b = 0.0;
+        cloud.points[i].a = 1.0;
+        cloud.points[i].label = value;
+        i++;
+  };
+  grid_.forEachCell(cloudVisitor);
+
+  pcl::io::savePCDFileASCII (path, cloud);
+  RCLCPP_INFO(node_->get_logger(), "Saved map to pcd file.");
+}
 }
 
 //todo add export to pointcloud or csv method
@@ -166,6 +199,7 @@ int main(int argc, char *argv[]) {
   args.add_argument("--scale").default_value(1.0).help("Set to a value between [0,1] to scale markers smaller.").scan<'f', double>();
   args.add_argument("--save").default_value("").help("Save the reachability map to the provided path.");
   args.add_argument("--load").default_value("").help("Load the reachability map from the provided path. This will not run the computation again.");
+  args.add_argument("--export-pcd").default_value("").help("Export the map as pointcloud pcd file.");
 
   try {
     args.parse_args(argc, argv);
@@ -189,6 +223,7 @@ int main(int argc, char *argv[]) {
   }
   std::string save_path = args.get<std::string>("--save");
   std::string load_path = args.get<std::string>("--load");
+  std::string export_path = args.get<std::string>("--export-pcd");
   std::cout << load_path << std::endl;
 
   auto grid_node = make_shared<reachability_map_moveit::ReachabilityMapMoveit>(robot_name, joint_group_name_, voxel_size, ang_step_size);
@@ -200,6 +235,9 @@ int main(int argc, char *argv[]) {
   if (save_path != ""){
     grid_node->save_reachability_map(save_path);
   }
+  if (export_path != ""){
+    grid_node -> export_pcd(export_path);
+  } 
   grid_node->send_marker_message(use_sphere, scale);
 
   grid_node->spin();

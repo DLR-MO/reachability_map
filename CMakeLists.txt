@@ -5,6 +5,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+find_package(PCL 1.3 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   ament_cmake
   geometry_msgs
@@ -35,6 +40,8 @@ target_compile_features(${TARGET_NAME} PUBLIC c_std_99 cxx_std_17)
 ament_target_dependencies(${TARGET_NAME}
 ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
+
+target_link_libraries(${TARGET_NAME} ${PCL_LIBRARIES})
 
 install(TARGETS ${TARGET_NAME}
   DESTINATION lib/${PROJECT_NAME}

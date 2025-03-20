@@ -18,11 +18,14 @@
 
 #include <argparse/argparse.hpp>
 
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+
 namespace reachability_map_moveit {
 
-template <typename C> struct is_vector : std::false_type {};    
-template <typename T,typename A> struct is_vector< std::vector<T,A> > : std::true_type {};    
-template <typename C> inline constexpr bool is_vector_v = is_vector<C>::value;
+//template <typename C> struct is_vector : std::false_type {};    
+//template <typename T,typename A> struct is_vector< std::vector<T,A> > : std::true_type {};    
+//template <typename C> inline constexpr bool is_vector_v = is_vector<C>::value;
 
 
 class ReachabilityMapMoveit {
@@ -34,9 +37,11 @@ class ReachabilityMapMoveit {
   void spin();
   void save_reachability_map(std::string path);
   void load_reachability_map(std::string path);
+  void export_pcd(std::string path);
 
  private:
   void try_configurations_recursively(long unsigned int i);
+  uint32_t get_max_value();
 
   rclcpp::Node::SharedPtr node_;
   const std::string robot_name_;
