@@ -30,7 +30,8 @@ accessor_(grid_.createAccessor())
   joint_group_ = robot_model_->getJointModelGroup(joint_group_name_);
   joint_names_ = joint_group_->getActiveJointModelNames();
   end_effector_name_ = joint_group_->getEndEffectorName();
-  end_effector_name_ = "end_effector"; //todo hack
+  //end_effector_name_ = "end_effector"; //todo hack
+  end_effector_name_ = "tool_link"; //todo hack
 
   // get bounds without more than one turn per joint
   for (long unsigned int i = 0; i < size(joint_names_); ++i) {
@@ -39,11 +40,11 @@ accessor_(grid_.createAccessor())
     const moveit::core::VariableBounds bounds = joint_bounds[0]; //todo this only works for single DOF joints
     double min_pos = bounds.min_position_;
     double max_pos = bounds.max_position_;
-    if (min_pos < M_PI) {
-        max_pos = std::min(max_pos, M_PI / 2);
+    if (min_pos <= -M_PI) {
+        max_pos = std::min(max_pos, M_PI);
     }
-    if (max_pos >= M_PI / 2) {
-        min_pos = std::max(min_pos, -M_PI / 2);
+    if (max_pos > M_PI) {
+        min_pos = std::max(min_pos, -M_PI);
     }
     current_positions_.push_back(min_pos);
     steps_per_joint_.push_back(round((max_pos - min_pos) / ang_step_size_));
@@ -115,7 +116,7 @@ void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
         double r = (max_val - value) / static_cast<double>(max_val);
         double g = value / static_cast<double>(max_val);
         visualization_msgs::msg::Marker marker;
-        marker.header.frame_id = "base_link";
+        marker.header.frame_id = "link1"; //todo hack
         marker.ns = "reachability_map";
         marker.id = id++;
         marker.type = type;
