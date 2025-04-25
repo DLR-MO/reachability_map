@@ -12,6 +12,8 @@
 #include <moveit/robot_model_loader/robot_model_loader.hpp>
 #include <moveit/robot_model/robot_model.hpp>
 #include <moveit/robot_state/robot_state.hpp>
+#include <moveit/planning_scene/planning_scene.hpp>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.hpp>
 
 #include "bonxai/bonxai.hpp"
 #include "bonxai/serialization.hpp"
@@ -66,6 +68,8 @@ class ReachabilityMapMoveit {
   uint32_t voxels_in_x_;
   uint32_t voxels_in_y_;
   uint32_t voxels_in_z_;
+  planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+  planning_scene::PlanningScenePtr planning_scene_;
 };
 
 

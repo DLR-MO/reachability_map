@@ -77,6 +77,14 @@ void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i) 
   if (i >= current_positions_.size()) {
       robot_state_->setJointGroupActivePositions(joint_group_, current_positions_);
       robot_state_->update();
+      collision_detection::CollisionRequest req;
+      collision_detection::CollisionResult res;
+      planning_scene_->checkCollision(req, res, *robot_state_, planning_scene_->getAllowedCollisionMatrix());
+
+      if(res.collision) {
+        return;
+      }
+
       Eigen::Vector3d position = robot_state_->getGlobalLinkTransform(end_effector_name_).translation();
       // this automatically initilized voxels with 0 if the voxel is not initialized
       auto* voxel = accessor_.value(grid_.posToCoord(position.x(), position.y(), position.z()), true);
@@ -172,7 +180,7 @@ void ReachabilityMapMoveit::export_pcd(std::string path){
         cloud.points[i].z = pos.z;        
         cloud.points[i].r = ((max_val - value) / static_cast<double>(max_val))*255;
         cloud.points[i].g = (value / static_cast<double>(max_val))*255; 
-        cloud.points[i].b = 0.0;
+        cloud.points[i].b = std::min((uint32_t)value, (uint32_t)255);
         cloud.points[i].a = 1.0;
         cloud.points[i].label = value;
         i++;
