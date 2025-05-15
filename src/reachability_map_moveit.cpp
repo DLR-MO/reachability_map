@@ -31,7 +31,7 @@ accessor_(grid_.createAccessor())
   joint_names_ = joint_group_->getActiveJointModelNames();
   end_effector_name_ = joint_group_->getEndEffectorName();
   //end_effector_name_ = "end_effector"; //todo hack
-  end_effector_name_ = "tool_link"; //todo hack
+  end_effector_name_ = "elise_tool"; //todo hack
 
   // get bounds without more than one turn per joint
   for (long unsigned int i = 0; i < size(joint_names_); ++i) {
