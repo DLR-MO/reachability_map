@@ -60,6 +60,13 @@ accessor_(grid_.createAccessor())
   }
   RCLCPP_INFO(node_->get_logger(), "Will need to compute %lu configurations.", poses_to_compute_);
 
+  // get the planning scene for collision checking
+  planning_scene_monitor_ = std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(node_, "robot_description");
+  planning_scene_ = planning_scene_monitor_->getPlanningScene();
+  if (!planning_scene_) {
+    RCLCPP_ERROR_ONCE(node_->get_logger(), "failed to connect to planning scene");
+  }
+
   // publisher for publishing outgoing messages
   marker_pub_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>("/reachability_map", 10);
 }
