@@ -68,7 +68,9 @@ accessor_(grid_.createAccessor())
   }
 
   // publisher for publishing outgoing messages
-  marker_pub_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>("/reachability_map", 10);
+  rclcpp::QoS qos(10);
+  qos.keep_last(1);
+  marker_pub_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>("/reachability_map", qos);
 }
 
 void ReachabilityMapMoveit::spin(){
