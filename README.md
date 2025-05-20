@@ -25,6 +25,8 @@ Use `--help` to see more options.
 For the UR10e we can do a quick reachability map with the following command. It will be both send as a marker topic for RViz but also exported as pointcloud (which can be used for further processing).
 `ros2 run reachability_map_moveit reachability_map_moveit ur_manipulator 0.01 30 --export-pcd test.pcd`
 
+The reachability map is send as a marker array message to RViz on the topic `/reachability_map`. The topic is transient local, so you can show it in RViz without having to restart the script it (make sure to set the topic durability policy of the MarkerArray in RViz to `Transient Local`).
+
 ## Limitatins
 
 This software currently only works for planning groups with a single tip.

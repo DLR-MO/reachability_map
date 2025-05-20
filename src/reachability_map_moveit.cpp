@@ -119,7 +119,18 @@ uint32_t ReachabilityMapMoveit::get_max_value(){
 
 
 void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
-  visualization_msgs::msg::MarkerArray marker_array;
+  // first remove old marker array message, this is necessary since the number of markers 
+  // might vary depending on voxel size, therefore, reusing the id does not work
+  std::string marker_ns = "reachability_map";
+  visualization_msgs::msg::MarkerArray delete_marker_array_msg = visualization_msgs::msg::MarkerArray();
+  visualization_msgs::msg::Marker delete_maker = visualization_msgs::msg::Marker();
+  delete_maker.id = 0;
+  delete_maker.ns = marker_ns;
+  delete_maker.action = visualization_msgs::msg::Marker::DELETEALL;
+  delete_marker_array_msg.markers.push_back(delete_maker);
+  marker_pub_->publish(delete_marker_array_msg);
+
+  visualization_msgs::msg::MarkerArray marker_array;  
   auto type = visualization_msgs::msg::Marker::CUBE;
   if (use_sphere){
     type = visualization_msgs::msg::Marker::SPHERE;
@@ -127,14 +138,15 @@ void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale) {
   uint32_t id = 0;
   uint32_t max_val = get_max_value();
 
-  auto markerVisitor = [this, &marker_array, &max_val, &id, &type, &scale](const uint32_t& value, const Bonxai::CoordT& coord) {    
+  auto markerVisitor = [this, &marker_array, &max_val, &id, &type, &scale, &marker_ns](const uint32_t& value, const Bonxai::CoordT& coord) {    
         double r = (max_val - value) / static_cast<double>(max_val);
         double g = value / static_cast<double>(max_val);
         visualization_msgs::msg::Marker marker;
         marker.header.frame_id = "link1"; //todo hack
-        marker.ns = "reachability_map";
+        marker.ns = marker_ns;
         marker.id = id++;
         marker.type = type;
+        marker.frame_locked = true;
         marker.scale.x = voxel_size_ * scale;
         marker.scale.y = voxel_size_ * scale;
         marker.scale.z = voxel_size_ * scale;
