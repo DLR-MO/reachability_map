@@ -26,11 +26,10 @@ accessor_(grid_.createAccessor())
   // create a Moveit Robot State to compute the forward kinematics
   robot_state_ = std::make_shared<moveit::core::RobotState>(moveit::core::RobotState(robot_model_));
   robot_state_->setToDefaultValues();
+  robot_state_->update();
   joint_group_ = robot_model_->getJointModelGroup(joint_group_name_);
-  joint_names_ = joint_group_->getActiveJointModelNames();
-  end_effector_name_ = joint_group_->getEndEffectorName();
-  //end_effector_name_ = "end_effector"; //todo hack
-  end_effector_name_ = "tool_link"; //todo hack
+  joint_names_ = joint_group_->getActiveJointModelNames();  
+  tip_name_ = joint_group_->getLinkModelNames().back();
 
   // get bounds without more than one turn per joint
   for (long unsigned int i = 0; i < size(joint_names_); ++i) {
@@ -76,7 +75,7 @@ void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i) 
   if (i >= current_positions_.size()) {
       robot_state_->setJointGroupActivePositions(joint_group_, current_positions_);
       robot_state_->update();
-      Eigen::Vector3d position = robot_state_->getGlobalLinkTransform(end_effector_name_).translation();
+      Eigen::Vector3d position = robot_state_->getGlobalLinkTransform(tip_name_).translation();
       // this automatically initilized voxels with 0 if the voxel is not initialized
       auto* voxel = accessor_.value(grid_.posToCoord(position.x(), position.y(), position.z()), true);
       (*voxel)++;

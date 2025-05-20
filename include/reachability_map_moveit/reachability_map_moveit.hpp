@@ -56,7 +56,7 @@ class ReachabilityMapMoveit {
   const moveit::core::JointModelGroup* joint_group_;
   Bonxai::VoxelGrid<uint32_t>::Accessor accessor_;
   std::vector<std::string> joint_names_;
-  std::string end_effector_name_;
+  std::string tip_name_;
   std::vector<double> current_positions_;
   std::vector<int> steps_per_joint_;
   std::vector<double> min_positions_;
