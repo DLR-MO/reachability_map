@@ -12,7 +12,7 @@ namespace reachability_map_moveit
 /**
  * @brief Constructor
  *
- * @param options node options
+ * @param options options
  */
 ReachabilityMapMoveit::ReachabilityMapMoveit(
   const std::string & joint_group_name,
@@ -64,6 +64,7 @@ ReachabilityMapMoveit::ReachabilityMapMoveit(
   RCLCPP_INFO(node_->get_logger(), "Will need to compute %lu configurations.", poses_to_compute_);
 
   // get the planning scene for collision checking
+  // TODO we create an empty planning scene only with the robot. would be a nice feature if existing planning scenes are used to include external geometry
   planning_scene_monitor_ = std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(node_,
       "robot_description");
   planning_scene_ = planning_scene_monitor_->getPlanningScene();
@@ -85,30 +86,36 @@ void ReachabilityMapMoveit::spin()
 
 void ReachabilityMapMoveit::generate_reachability_map()
 {
+  // we use a recursive function to iterate through all possible configurations
   try_configurations_recursively(0);
   RCLCPP_INFO(node_->get_logger(), "\nFinished generating the reachability map.");
 }
 
 void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i)
 {
+  // check if we reached the deepest level of recursion
   if (i >= current_positions_.size()) {
+    // set robot to current configuration
     robot_state_->setJointGroupActivePositions(joint_group_, current_positions_);
     robot_state_->update();
+    // ignore this configuration if it has collisions
     collision_detection::CollisionRequest req;
     collision_detection::CollisionResult res;
     planning_scene_->checkCollision(req, res, *robot_state_,
         planning_scene_->getAllowedCollisionMatrix());
-
     if(res.collision) {
       return;
     }
 
     Eigen::Vector3d position = robot_state_->getGlobalLinkTransform(tip_name_).translation();
-      // this automatically initilized voxels with 0 if the voxel is not initialized
+    // this automatically initilized voxels with 0 if the voxel is not initialized
     auto * voxel = accessor_.value(grid_.posToCoord(position.x(), position.y(), position.z()),
         true);
     (*voxel)++;
 
+    // Display progress by using cout to overwrite old value
+    // TODO this could lead to issues when there is other output in the terminal
+    // TODO maybe another way of doing this would be better, e.g. publishing it on a topic
     if (++pose_counter_ % 1000 == 0) {
       std::cout << "\r" << pose_counter_ * 100.0 / poses_to_compute_ << "% done" << std::flush;
     }
@@ -153,6 +160,7 @@ void ReachabilityMapMoveit::send_marker_message(bool use_sphere, float scale)
   uint32_t id = 0;
   uint32_t max_val = get_max_value();
 
+  // we use the bonxai function to call a function for each voxel in the map to create the markers
   auto markerVisitor = [this, &marker_array, &max_val, &id, &type, &scale,
       &marker_ns](const uint32_t & value, const Bonxai::CoordT & coord) {
       double r = (max_val - value) / static_cast<double>(max_val);
@@ -200,6 +208,7 @@ void ReachabilityMapMoveit::load_reachability_map(std::string path)
   grid_ = Bonxai::Deserialize<uint32_t>(file, info);
   RCLCPP_INFO(node_->get_logger(), "Loaded reachability map from file.");
 }
+
 void ReachabilityMapMoveit::export_pcd(std::string path)
 {
   pcl::PointCloud<pcl::PointXYZRGBL> cloud;
@@ -217,6 +226,7 @@ void ReachabilityMapMoveit::export_pcd(std::string path)
       cloud.points[i].x = pos.x;
       cloud.points[i].y = pos.y;
       cloud.points[i].z = pos.z;
+      // we use the rgb channels to encode the number of poses as relative and absolute values
       cloud.points[i].r = ((max_val - value) / static_cast<double>(max_val)) * 255;
       cloud.points[i].g = (value / static_cast<double>(max_val)) * 255;
       cloud.points[i].b = std::min((uint32_t)value, (uint32_t)255);
@@ -230,8 +240,6 @@ void ReachabilityMapMoveit::export_pcd(std::string path)
   RCLCPP_INFO(node_->get_logger(), "Saved map to pcd file.");
 }
 }
-
-//todo add export to pointcloud or csv method
 
 int main(int argc, char *argv[])
 {
@@ -262,11 +270,10 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  //TODO get this from arguments
-  string joint_group_name_ = args.get<std::string>("joint-group-name");//"endo";
-  double voxel_size = args.get<double>("voxel-size");//0.005;
-  double ang_step_size = args.get<double>("sampling-resolution") * (M_PI / 180.0);//M_PI / 360;
-  bool use_sphere = args.get<bool>("--sphere");//true
+  string joint_group_name_ = args.get<std::string>("joint-group-name");
+  double voxel_size = args.get<double>("voxel-size");
+  double ang_step_size = args.get<double>("sampling-resolution") * (M_PI / 180.0);
+  bool use_sphere = args.get<bool>("--sphere");
   double scale = args.get<double>("--scale");
   if (scale < 0.0 || scale > 1.0) {
     std::cerr << "Scale must be between [0,1]." << std::endl;
