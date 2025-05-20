@@ -13,9 +13,8 @@ namespace reachability_map_moveit {
  *
  * @param options node options
  */
-ReachabilityMapMoveit::ReachabilityMapMoveit(const std::string& robot_name, const std::string& joint_group_name, const double voxel_size, const double ang_step_size) 
+ReachabilityMapMoveit::ReachabilityMapMoveit(const std::string& joint_group_name, const double voxel_size, const double ang_step_size) 
 : node_(rclcpp::Node::make_shared("reachability_map_moveit")), 
-robot_name_(robot_name), 
 joint_group_name_(joint_group_name), 
 voxel_size_(voxel_size), 
 ang_step_size_(ang_step_size), 
@@ -191,7 +190,6 @@ int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
 
   argparse::ArgumentParser args("Reachability Map Moveit");
-  args.add_argument("robot-name").help("Name of your robot, e.g. \"panda\"");
   args.add_argument("joint-group-name").help("Name of the joint group that you want to use.");
   args.add_argument("voxel-size").help("Size of the voxel [m].").scan<'f', double>();
   args.add_argument("sampling-resolution").help("Angular sampling resolution [deg].").scan<'f', double>();
@@ -212,7 +210,6 @@ int main(int argc, char *argv[]) {
   }
 
   //TODO get this from arguments
-  string robot_name = args.get<std::string>("robot-name");//"elise";
   string joint_group_name_ = args.get<std::string>("joint-group-name");//"endo";
   double voxel_size = args.get<double>("voxel-size");//0.005;
   double ang_step_size = args.get<double>("sampling-resolution") * (M_PI / 180.0);//M_PI / 360;
@@ -227,7 +224,7 @@ int main(int argc, char *argv[]) {
   std::string export_path = args.get<std::string>("--export-pcd");
   std::cout << load_path << std::endl;
 
-  auto grid_node = make_shared<reachability_map_moveit::ReachabilityMapMoveit>(robot_name, joint_group_name_, voxel_size, ang_step_size);
+  auto grid_node = make_shared<reachability_map_moveit::ReachabilityMapMoveit>(joint_group_name_, voxel_size, ang_step_size);
   if(load_path == ""){
     grid_node->generate_reachability_map();
   }else{

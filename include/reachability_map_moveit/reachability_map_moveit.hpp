@@ -31,7 +31,7 @@ namespace reachability_map_moveit {
 class ReachabilityMapMoveit {
 
  public:
-  ReachabilityMapMoveit(const std::string& robot_name, const std::string& joint_group_name, const double voxel_size, const double ang_step_size);
+  ReachabilityMapMoveit(const std::string& joint_group_name, const double voxel_size, const double ang_step_size);
   void generate_reachability_map();
   void send_marker_message(bool use_sphere, float scale);
   void spin();
@@ -44,7 +44,6 @@ class ReachabilityMapMoveit {
   uint32_t get_max_value();
 
   rclcpp::Node::SharedPtr node_;
-  const std::string robot_name_;
   const std::string joint_group_name_;
   const std::vector<std::vector<double>> map_size_; //m  
   const double voxel_size_; //m
