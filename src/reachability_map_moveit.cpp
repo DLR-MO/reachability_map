@@ -35,7 +35,7 @@ accessor_(grid_.createAccessor())
   for (long unsigned int i = 0; i < size(joint_names_); ++i) {
     const moveit::core::JointModel* joint_model = joint_group_->getJointModel(joint_names_[i]);  
     const moveit::core::JointModel::Bounds& joint_bounds = joint_model->getVariableBounds();
-    const moveit::core::VariableBounds bounds = joint_bounds[0]; //todo this only works for single DOF joints
+    const moveit::core::VariableBounds bounds = joint_bounds[0]; //TODO this only works for single DOF joints, either trow an error if its more DoF or use a more complex solution
     double min_pos = bounds.min_position_;
     double max_pos = bounds.max_position_;
     if (min_pos <= -M_PI) {
@@ -66,8 +66,8 @@ accessor_(grid_.createAccessor())
   }
 
   // publisher for publishing outgoing messages
-  rclcpp::QoS qos(10);
-  qos.keep_last(1);
+  rclcpp::QoS qos(10);  
+  qos.transient_local();
   marker_pub_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>("/reachability_map", qos);
 }
 
