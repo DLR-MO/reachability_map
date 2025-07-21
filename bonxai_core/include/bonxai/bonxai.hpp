@@ -166,7 +166,7 @@ class VoxelGrid {
   /**
    *  Try freeing memory;  this will discard grids where all the cells are OFF.
    *  Note that the memory release is NOT guaranteed, since we are using a memory pool too.
-   *  CAREFULL: This will invalidate all the existing Accessors (you need to create new ones).
+   *  CAREFUL: This will invalidate all the existing Accessors (you need to create new ones).
    */
   void releaseUnusedMemory();
 
