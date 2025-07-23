@@ -18,7 +18,7 @@
 #include "bonxai/bonxai.hpp"
 #include "bonxai/serialization.hpp"
 
-#include <argparse/argparse.hpp>
+#include "reachability_map_moveit/argparse.hpp"
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
