@@ -20,7 +20,7 @@
 namespace Bonxai {
 
 /**
- * @brief The GridBlockAllocator is used to pre-allocate the meory of multiple Grids
+ * @brief The GridBlockAllocator is used to pre-allocate the memory of multiple Grids
  * in "chunks". It is a very simple memory pool.
  *
  * Each chunk allocates memory for 512 Grids

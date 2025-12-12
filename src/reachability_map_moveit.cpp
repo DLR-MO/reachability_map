@@ -108,7 +108,7 @@ void ReachabilityMapMoveit::try_configurations_recursively(long unsigned int i)
     }
 
     Eigen::Vector3d position = robot_state_->getGlobalLinkTransform(tip_name_).translation();
-    // this automatically initilized voxels with 0 if the voxel is not initialized
+    // this automatically initialized voxels with 0 if the voxel is not initialized
     auto * voxel = accessor_.value(grid_.posToCoord(position.x(), position.y(), position.z()),
         true);
     (*voxel)++;
@@ -212,7 +212,7 @@ void ReachabilityMapMoveit::load_reachability_map(std::string path)
 void ReachabilityMapMoveit::export_pcd(std::string path)
 {
   pcl::PointCloud<pcl::PointXYZRGBL> cloud;
-  // we need to publish it als unorganized cloud
+  // we need to publish it as unorganized cloud
   cloud.width = grid_.activeCellsCount();
   cloud.height = 1;
   cloud.is_dense = true;

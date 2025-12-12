@@ -1,7 +1,7 @@
 # reachability_map_moveit
 
 This package allows you to generate reachability maps for robots based on their their URDF and MoveIt configuration.
-It will try out all possible joint configurations (their sampling resolution can be choosen) and use forward kinematics to get the pose of the endefector.
+It will try out all possible joint configurations (their sampling resolution can be chosen) and use forward kinematics to get the pose of the endefector.
 A bonxai voxel map will be used to count all poses that end in each voxel. Thereby, it is possible to create a 3D voxel map that shows which areas the robot can reach and how many different configurations lead to this.
 
 ## Installation

@@ -11,14 +11,13 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-  ament_cmake
-  geometry_msgs
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  rclcpp
-  visualization_msgs
-)
+    ament_cmake
+    geometry_msgs
+    moveit_core
+    moveit_ros_planning
+    moveit_ros_planning_interface
+    rclcpp
+    visualization_msgs)
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -30,36 +29,27 @@ set(TARGET_NAME reachability_map_moveit)
 
 add_executable(${TARGET_NAME} src/reachability_map_moveit.cpp)
 
-target_include_directories(${TARGET_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  bonxai_core/include
-)
+target_include_directories(
+  ${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                        $<INSTALL_INTERFACE:include> bonxai_core/include)
 target_compile_features(${TARGET_NAME} PUBLIC c_std_99 cxx_std_17)
 
-ament_target_dependencies(${TARGET_NAME}
-${THIS_PACKAGE_INCLUDE_DEPENDS}
-)
+ament_target_dependencies(${TARGET_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 target_link_libraries(${TARGET_NAME} ${PCL_LIBRARIES})
 
-install(TARGETS ${TARGET_NAME}
-  DESTINATION lib/${PROJECT_NAME}
-)
+install(TARGETS ${TARGET_NAME} DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY launch
+install(
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
-  OPTIONAL
-)
+  OPTIONAL)
 
-install(DIRECTORY config
+install(
+  DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
-  OPTIONAL
-)
+  OPTIONAL)
 
-ament_export_dependencies(
-  ${THIS_PACKAGE_INCLUDE_DEPENDS}
-)
-
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 ament_package()

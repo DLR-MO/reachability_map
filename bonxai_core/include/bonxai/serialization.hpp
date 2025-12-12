@@ -33,7 +33,7 @@ struct HeaderInfo {
 };
 
 /**
- * @brief GetHeaderInfo is used to recover informations from the header of a
+ * @brief GetHeaderInfo is used to recover information from the header of a
  * file/stream
  *
  * @param header  first line of the file
