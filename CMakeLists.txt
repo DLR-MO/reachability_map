@@ -23,15 +23,16 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
-add_subdirectory(bonxai_core)
+add_subdirectory(third_party/bonxai_core)
 
 set(TARGET_NAME reachability_map_moveit)
 
 add_executable(${TARGET_NAME} src/reachability_map_moveit.cpp)
 
 target_include_directories(
-  ${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                        $<INSTALL_INTERFACE:include> bonxai_core/include)
+  ${TARGET_NAME}
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include> third_party/bonxai_core/include)
 target_compile_features(${TARGET_NAME} PUBLIC c_std_99 cxx_std_17)
 
 ament_target_dependencies(${TARGET_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})

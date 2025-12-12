@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: NONE
+#
+# SPDX-License-Identifier: CC0-1.0
 # To use:
 #
 #     pre-commit run -a
@@ -12,10 +15,11 @@
 #
 # See https://github.com/pre-commit/pre-commit
 
+exclude: 'third_party/'
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -31,12 +35,10 @@ repos:
       - id: mixed-line-ending
       - id: pretty-format-json
       - id: trailing-whitespace
-
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.11.0
     hooks:
       - id: black
-
   - repo: local
     hooks:
       - id: clang-format
@@ -52,7 +54,6 @@ repos:
       - id: codespell
         args: ['--write-changes', '--ignore-words=.codespell_words', '--skip="*.eps"']
         exclude: CHANGELOG.rst
-
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
@@ -62,3 +63,7 @@ repos:
                --disabled-codes=C0307,
                --suppress-decorations
               ]
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v5.0.2
+    hooks:
+      - id: reuse
