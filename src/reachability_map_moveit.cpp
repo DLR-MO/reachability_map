@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Marc Bestmann, German Aerospace Center (DLR)
+//
+// SPDX-License-Identifier: MIT
+
 #include <functional>
 
 #include <reachability_map_moveit/reachability_map_moveit.hpp>

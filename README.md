@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 Marc Bestmann, German Aerospace Center (DLR)
+
+SPDX-License-Identifier: MIT
+-->
+
 # reachability_map_moveit
 
 This package allows you to generate reachability maps for robots based on their their URDF and MoveIt configuration.

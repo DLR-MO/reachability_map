@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Marc Bestmann, German Aerospace Center (DLR)
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <memory>

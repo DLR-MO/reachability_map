@@ -1,0 +1,7 @@
+version = 1
+[[annotations]]
+path = "third_party/bonxai_core/**"
+SPDX-License-Identifier = "MPL-2.0"
+SPDX-FileCopyrightText = "2025 Davide Faconti, Bonxai Project, OpenVDB Project"
+SPDX-PackageName = "Bonxai"
+SPDX-PackageDownloadLocation = "https://github.com/facontidavide/Bonxai"
