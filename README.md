@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2025 Marc Bestmann, German Aerospace Center (DLR)
 SPDX-License-Identifier: MIT
 -->
 
-# reachability_map_moveit
+# MoveIt Reachability Maps
 
 This package allows you to generate and visualize reachability maps for robots based on their their URDF and [MoveIt 2](https://github.com/moveit/moveit2) configuration.
 It will try out all possible joint configurations (their sampling resolution can be chosen) and use forward kinematics to get the pose of the endeffector.
