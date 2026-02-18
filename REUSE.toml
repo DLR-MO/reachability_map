@@ -5,3 +5,8 @@ SPDX-License-Identifier = "MPL-2.0"
 SPDX-FileCopyrightText = "2025 Davide Faconti, Bonxai Project, OpenVDB Project"
 SPDX-PackageName = "Bonxai"
 SPDX-PackageDownloadLocation = "https://github.com/facontidavide/Bonxai"
+
+[[annotations]]
+path = ".github/**"
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"
