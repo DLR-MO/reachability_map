@@ -4,20 +4,20 @@
 
 #pragma once
 
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <math.h>
 #include <memory>
 #include <string>
 #include <vector>
-#include <math.h>
-#include <iostream>
-#include <cmath>
-#include <fstream>
 
-#include <rclcpp/rclcpp.hpp>
-#include <moveit/robot_model_loader/robot_model_loader.hpp>
-#include <moveit/robot_model/robot_model.hpp>
-#include <moveit/robot_state/robot_state.hpp>
 #include <moveit/planning_scene/planning_scene.hpp>
 #include <moveit/planning_scene_monitor/planning_scene_monitor.hpp>
+#include <moveit/robot_model/robot_model.hpp>
+#include <moveit/robot_model_loader/robot_model_loader.hpp>
+#include <moveit/robot_state/robot_state.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include "bonxai/bonxai.hpp"
 #include "bonxai/serialization.hpp"
@@ -27,20 +27,18 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 
-namespace reachability_map_moveit
-{
+namespace reachability_map_moveit {
 
-//template <typename C> struct is_vector : std::false_type {};
-//template <typename T,typename A> struct is_vector< std::vector<T,A> > : std::true_type {};
-//template <typename C> inline constexpr bool is_vector_v = is_vector<C>::value;
-
+// template <typename C> struct is_vector : std::false_type {};
+// template <typename T,typename A> struct is_vector< std::vector<T,A> > :
+// std::true_type {}; template <typename C> inline constexpr bool is_vector_v =
+// is_vector<C>::value;
 
 class ReachabilityMapMoveit {
 
 public:
-  ReachabilityMapMoveit(
-    const std::string & joint_group_name, const double voxel_size,
-    const double ang_step_size);
+  ReachabilityMapMoveit(const std::string &joint_group_name,
+                        const double voxel_size, const double ang_step_size);
   void generate_reachability_map();
   void send_marker_message(bool use_sphere, float scale);
   void spin();
@@ -54,15 +52,16 @@ private:
 
   rclcpp::Node::SharedPtr node_;
   const std::string joint_group_name_;
-  const std::vector<std::vector<double>> map_size_; //m
-  const double voxel_size_; //m
-  const double ang_step_size_; //rad
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  const std::vector<std::vector<double>> map_size_; // m
+  const double voxel_size_;                         // m
+  const double ang_step_size_;                      // rad
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
+      marker_pub_;
   robot_model_loader::RobotModelLoader robot_model_loader_;
-  const moveit::core::RobotModelPtr & robot_model_;
+  const moveit::core::RobotModelPtr &robot_model_;
   Bonxai::VoxelGrid<uint32_t> grid_;
   moveit::core::RobotStatePtr robot_state_;
-  const moveit::core::JointModelGroup * joint_group_;
+  const moveit::core::JointModelGroup *joint_group_;
   Bonxai::VoxelGrid<uint32_t>::Accessor accessor_;
   std::vector<std::string> joint_names_;
   std::string tip_name_;
@@ -78,5 +77,4 @@ private:
   planning_scene::PlanningScenePtr planning_scene_;
 };
 
-
-}
+} // namespace reachability_map_moveit
